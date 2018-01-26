@@ -12,4 +12,6 @@ vagrant ssh
 vagrant destroy -f
 #test master minion setup
 cd multi
-vagrant up master && vagrant up minion
+vagrant up
+gem install serverspec
+serverspec-init
