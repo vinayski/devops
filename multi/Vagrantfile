@@ -1,0 +1,64 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+#Vagrant.require_version ">= 1.8.5", "<= 1.8.6"
+Vagrant.require_version ">= 1.8.5"
+
+Vagrant.configure("2") do |config|
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  config.vm.box = "ubuntu/trusty64"
+  # if you have problems mapping directories, remove the next line
+  # config.vbguest.auto_update = false
+  #
+  config.vm.provider "virtualbox" do |vb|
+     # Display the VirtualBox GUI when booting the machine
+    vb.gui = true
+     # Customize the amount of memory on the VM:
+     vb.memory = "512"
+   end
+
+   config.vm.provision :salt do |salt|
+         salt.masterless = false
+         salt.run_highstate = false
+         config.ssh.pty = false
+       end
+
+   config.vm.define "master" do |master|
+       master.vm.synced_folder "./master-salt", "/srv/salt"
+       master.vm.network "private_network", ip: "192.168.50.10"
+
+       master.vm.provision :salt do |saltmaster|
+         saltmaster.install_master = true
+         saltmaster.minion_config = "salt/master"
+         saltmaster.minion_key = "salt/key/master.pem"
+         saltmaster.minion_pub = "salt/key/master.pub"
+         saltmaster.master_key = "salt/key/master.pem"
+         saltmaster.master_pub = "salt/key/master.pub"
+         saltmaster.seed_master = {master:'salt/key/master.pub', minion:'salt/key/minion.pub'}
+         saltmaster.install_type = "stable"
+         saltmaster.verbose = true
+         saltmaster.colorize = true
+         saltmaster.bootstrap_options = "-P -c /tmp"
+       end
+
+   end
+
+
+   config.vm.define "minion" do |minion|
+       minion.vm.network "private_network", ip: "192.168.50.20"
+
+       minion.vm.provision :salt do |saltminion|
+         saltminion.minion_config = "salt/minion"
+         saltminion.minion_key = "salt/key/minion.pem"
+         saltminion.minion_pub = "salt/key/minion.pub"
+         saltminion.install_type = "stable"
+         saltminion.verbose = true
+         saltminion.colorize = true
+         saltminion.bootstrap_options = "-P -c /tmp"
+       end
+
+    end
+
+
+end

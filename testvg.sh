@@ -10,3 +10,6 @@ vagrant status
 vagrant ssh
 # destroy
 vagrant destroy -f
+#test master minion setup
+cd multi
+vagrant up master && vagrant up minion
