@@ -13,5 +13,9 @@ vagrant destroy -f
 #test master minion setup
 cd multi
 vagrant up
+#Install Serverspec for testing
 gem install serverspec
+#Create sample tests
 serverspec-init
+#Run Tests
+rake spec
