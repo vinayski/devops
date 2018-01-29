@@ -8,7 +8,8 @@ resource "docker_image" "nginx" {
 
 
 resource "docker_container" "nginx-server" {
-  name = "nginx-server"
+  count = 2
+  name = "nginx-server-${count.index+1}"
   image = "${docker_image.nginx.latest}"
   ports {
     internal = 80
