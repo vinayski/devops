@@ -20,4 +20,18 @@ ansible-doc apt
 # remove sysstat pkg
 sed -i -e 's/state: latest/state: absent/' -e 's/ensure.*/ensure sysstat is removed/' site.yml
 ansible-playbook -i myhosts site.yml
+#install httpd
+echo '
+    - name: ensure httpd
+      apt:
+        name: nginx
+        state: latest
+
+    - name: start httpd
+      service: name=nginx state=running
+
+  handlers:
+    -name: restart apache
+    service: name=nginx state=restarted'>>site.yml
+ansible-playbook -i myhosts site.yml
 
