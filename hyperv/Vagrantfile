@@ -1,0 +1,22 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+  config.vm.provider "hyperv"
+  config.vm.network "public_network"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provider "hyperv" do |h|
+    h.memory = "512"
+    h.enable_virtualization_extensions = true
+    h.differencing_disk = true
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "%_query_all_fmt %%{name}-%%{version}-%%{release}.%%{arch}" >> ~/.rpmmacros
+    yum update
+    yum install epel-release
+    yum install ansible
+    SHELL
+end
