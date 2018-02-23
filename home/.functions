@@ -1,0 +1,349 @@
+tarf() {
+	find . -name *$1 | tar -cvzf $1.tar -T -
+	gzip -9 $1.tar
+	ls -lart $1.*
+}
+tarx() {
+	rm -rf $1.tar*
+	find $1 -type f \( ! -iname "*ar" \) | tar -cvzf $1.tar -T -
+	gzip -9 $1.tar
+	ls -lart $1.*
+}
+getPid() {  /usr/ucb/ps -auxww | egrep -v '(awk)|(grep)' | grep $@ |  awk '{ print $2}'; 
+}
+getCount() {  
+	echo $1;
+	grep $1 $2 | wc -l 
+}
+dopfiles() {
+	pfiles -F `/usr/ucb/ps -auxww | egrep -v '(awk)|(grep)' | grep $@ |  awk '{echo $2}'`;
+}
+searchInLogs(){
+	ssh $1 "grep -h $2 $3 | cut -f1,3 -d\"^\"" | cut -c10-50 | sed s:/logs/dataloader_:^:g | sed s:ecdb::g | sed s:EDT::g | cut -f1,2,4 -d":" | sed s:\\\^:,:g | sed s/:/,/g | sed s/,,/,/g
+}
+donetstat() {
+        netstat | egrep '(40000)|(40001)|(40890)|(40962)' > netstat.txt
+        while [ true ] ; do 
+		netstat | egrep '(40000)|(40001)|(40890)|(40962)' > netstat.1
+		diff netstat.txt netstat.1
+        done
+}
+avg() {
+	perl -ne '$n += $_;$i++; print "Avg: " .  $n/$i . "  Total: $n  Count: $i\n" if eof';
+}
+formatdump() {
+        perl -ne 's{\d}{}g;print "$1 $2 $6\n" if(m{^\"([^\"]*)\"(.*)prio=(.*)tid=(.*)nid=([^ ]*)([^\[]*)})';
+}
+stats() {
+	perl -ne 'use lib ".";use Stats;$s = Stats::Full->new() if (!defined $s);$Stats::Tolerance = 1e-10;$s->add_data($_);print "Count:" .  $s->count() . " Min:" . $s->min() . " Mean:" . &round($s->mean()) . " Median:" . &round($s->median()) . " HMean:" . &round($s->harmonic_mean()) . " GMean:" . &round($s->geometric_mean()) . " Mode:" . &round($s->mode()) ." Max:" . $s->max() . " 90 Per:". $s->percentile(90) . " 95 Per:" . $s->percentile(95) ." 99 Per:" . $s->percentile(99) . "  SDev:" . &round($s->standard_deviation()) . " Variance:" . &round($s->variance())  ."\n" if eof; sub round{my ($str,$no,@subs)= @_; $f="%2.2d";sprintf($f,$str); }';
+}
+grpn() {
+	perl -ne '$c{"\n$_"}+=1;print %c if eof';
+}
+cutf() {
+        perl -ne 'print $_';
+}
+transferkeys() {
+	echo transfer to $1
+  echo scp ~/.ssh/authorized_keys $1:.ssh
+  scp ~/.ssh/authorized_keys $1:.ssh
+	echo scp ~/hosts ~/.profile ~/.functions ~/.aliases $1:~ 
+	scp ~/hosts ~/.profile ~/.functions ~/.aliases $1:~
+}
+generatekeys() {
+	ssh $1 ssh-keygen -t dsa
+  transferkeys $1
+	scp $1:.ssh/id_dsa.pub $1.pub
+	cat $1.pub >> ~/.ssh/authorized_keys
+  transferall
+}
+transferall() {
+	file=~/hosts
+	while IFS=\; read host nick
+	do
+		echo "Transfer profile to $host"
+		transferkeys  	$host
+	done <"$file"
+	generatehostaliases
+}
+generatehostaliases() {
+	file=~/hosts
+	while IFS=\; read host nick
+	do
+		echo "alias  $nick to $host"
+		alias $nick="ssh -X $host"
+		alias su$nick="sudo /bin/su - $host"
+	done <"$file"
+}
+vif() {
+	find $1 -name $2 -exec vi {} \;
+}
+cpcore() {
+	ls -lart $1
+	find ~/app/distro -name $1 -exec cp {} . \;
+	ls -lart $1
+}
+currpkg() {
+	cat /bto/sys/dds/rem/$1/curr/*;
+}
+tailproc() {
+	tail -f /bto/sys/dds/rem/$1/proc_out;
+}
+loop() {
+       while [ true ] ;
+       do
+       $@ ;
+       done;
+}
+iordump1() {
+	iordump `itadmin ns resolve $1`;
+}
+extractport() {
+	perl -ne '$host=$1 if(m{Host string: .(.*).$}g);$port=$1 if(m{Port: (.*)$}g);print $host . $port if eof';
+}
+extractt3url() {
+	perl -ne 'print "$1\n" if m{-Dt3.url=([^ ]*)}g;';
+}
+threads() {
+	ps -fLp `getPid $1`
+}
+noofthreads() {
+       ps -o nlwp -p `getPid $1`
+}
+trimport() {
+        perl -ne '($ip1,$ip2)=split " ";
+        $last = rindex $ip2,".";
+        $ret = substr $ip2,0,$last;
+	print $ret. "\n";'
+}
+getIP() {
+	ping -c 1 $1 | grep ttl | perl -ne 'print $1 if m/\((.*)\)/'
+}
+removeDups() {
+         perl -ne 'chop $_;$count{$_}+=1;
+         $f = true if eof;
+         my @keys = map { $_->[0] } sort { $b->[1]  <=>  $a->[1] } map { [$_, $count{$_}] } keys %count;
+         foreach (@keys) { print "$_," if defined $f; }'
+}
+getPorts() {
+	grep $1 tunnellist | cut -f3 -d: | removeDups
+}
+getIPort() {
+	ip=`getIP $1`;
+	port=`getPorts $1`;
+	echo "$ip,$1,\"$port\"";
+}
+groupby() {
+         perl -ne 'chop $_;$count{$_}+=1;
+         $f = true if eof;
+         my @keys = map { $_->[0] } sort { $b->[1]  <=>  $a->[1] } map { [$_, $count{$_}] } keys %count;
+         foreach (@keys) { print "$_,$count{$_}\n" if defined $f; }'
+}
+getOOT() {
+	scp osdadm:/var/www/html/amdocs/nats/natlist .
+	scp osdadm:/var/www/html/amdocs/ports/tunnellist .
+	cut -f2 -d: tunnellist | sort -u | xargs -i{} -t echo " getIPort {}"
+}
+groupby123() {
+         perl -ne 'chop $_;($h,$m,$d,$l) = split /,/;$a{$h}{$m}{$d}{$l}+=1;
+         if(($pm != $m)||eof)
+         { foreach(keys %{$a{$ph}{$pm}})
+                { $db=$_;
+                  print $ph . "," . $pm . "," . $db . "," . $a{$ph}{$pm}{$db}{"1"} . "," . $a{$ph}{$pm}{$db}{"2"} . "," . $a{$ph}{$pm}{$db}{"3"} . "," . $a{$ph}{$pm}{$db}{"4"} . "\n";
+                  undef $a{$ph}{$pm}{$db};
+                } undef %{$a{$ph}{$pm}};
+        } $ph = $h; $pm = $m;'
+}
+
+sockets() {
+	netstat -an | grep `iordump1 $1 | extractport` | trimport  |  perl -ne 'print' | groupby
+}
+neatlogs() {
+	cut -f1,6,7,10,11 -d "^";
+}
+findlog() {
+	trans=`ssh $1 "egrep -h \"$4\" /opt/app/cbs/common/logs/$2/debug.log /opt/app/cbs/common/logs_backup/$2/debug.log | grep $3 | tail -1fl |  cut -f1 -d\"~\" | cut -f2 -d\"[\" "`;
+	echo "Details for $trans";
+	ssh $1 "egrep -h $trans /opt/app/cbs/common/logs/$2/debug.log /opt/app/cbs/common/logs_backup/$2/debug.log"
+}
+printable() {
+	sed '/[^ -~]/ s// /g';
+}
+trim() {
+	sed 's/^[ \t]*//;s/[ \t]*$//';
+}
+cuttime() {
+	cut -f11 -d "^" | cut -d":" -f1; 
+}
+getavg() {
+	grep "Perf.Elapsed.ms.$@" debug.log | cuttime | avg; 
+}
+catlogs() {
+	grep "Perf.Elapsed.ms.$@" debug.log; 
+}
+sorttime() {
+	cuttime | sort -n;
+}
+findmarshal() {
+	grep MARSHAL | awk '{echo $6 " " $7 " " $5 " MARSHAL"}' | sort -u
+}
+findtimeout() {
+	grep TIMEOUT | awk '{echo $6 " " $7 " " $5 " TIMEOUT"}' | sort -u
+}
+findgoodinstances() {
+	egrep -v 'MARSHAL|TIMEOUT' | awk '{echo $6 " " $7 " " $5 " GOOD"}' | sort -u
+}
+
+getregion(){
+       echo $@ | perl -ne 'chop;$no=$_;%NPA_RegionMatrix=("205","Alabama","251","Alabama", "256","Alabama","334","Alabama","270","Kentucky","502","Kentucky","606","Kentucky","859","Kentucky","225","Louisiana","318","Louisiana","337","Louisiana","504","Louisiana","985","Louisiana","228","Mississippi","601","Mississippi","662","Mississippi","423","Tennessee","615","Tennessee","731","Tennessee","865","Tennessee","901","Tennessee","931","Tennessee","252","North Carolina","336","North Carolina","704","North Carolina","828","North Carolina","910","North Carolina","919","North Carolina","980","North Carolina","803","South Carolina","843","South Carolina","864","South Carolina", "404","Atlanta","678","Atlanta","770","Atlanta","229","Macon","478","Macon","706","Macon","912","Macon","321","Jacksonville","352","Jacksonville","386","Jacksonville","850","Jacksonville","904","Jacksonville","407","Ft. Lauderdale", "561","Ft. Lauderdale", "772","Ft. Lauderdale", "813","Ft. Lauderdale","954","Ft. Lauderdale","305","Miami", "786","Miami");print $NPA_RegionMatrix{$no}';
+}
+
+formatlogs(){
+	perl -ne '%NPA_RegionMatrix=("205","Alabama","251","Alabama", "256","Alabama","334","Alabama","270","Kentucky","502","Kentucky","606","Kentucky","859","Kentucky","225","Louisiana","318","Louisiana","337","Louisiana","504","Louisiana","985","Louisiana","228","Mississippi","601","Mississippi","662","Mississippi","423","Tennessee","615","Tennessee","731","Tennessee","865","Tennessee","901","Tennessee","931","Tennessee","252","North Carolina","336","North Carolina","704","North Carolina","828","North Carolina","910","North Carolina","919","North Carolina","980","North Carolina","803","South Carolina","843","South Carolina","864","South Carolina", "404","Atlanta","678","Atlanta","770","Atlanta","229","Macon","478","Macon","706","Macon","912","Macon","321","Jacksonville","352","Jacksonville","386","Jacksonville","850","Jacksonville","904","Jacksonville","407","Ft. Lauderdale", "561","Ft. Lauderdale", "772","Ft. Lauderdale", "813","Ft. Lauderdale","954","Ft. Lauderdale","305","Miami", "786","Miami");($date,$host,$service,$seq,$class,$transactionid,$clientid,$userid,$logtype,$object,$stack_trace)= split /\^/;($timemilli,$random,$timeout,$account,$domain)=split "~",$transactionid;($domain)=split "]",$domain;($account) = split "]",$account;$npa=substr $account,0,3; $region=$NPA_RegionMatrix{$npa};print "$date,$host,$domain,$random,$timeout,$clientid,$userid,$account,$region,$stack_trace"';
+}
+
+splitbyregion(){
+	echo $@ | perl -ne 'chop;$f=$_;%hm=('Alabama','2052210562','Kentucky','2708306187','Louisiana','2257558864','Mississippi','2052210562','Tennessee','4234732206','North Carolina','2052210562','South Carolina','8034620208','Atlanta','4042985115','Macon','2294354014','Jacksonville','3214543875','Ft. Lauderdale','4072980059','Miami','3057570506');foreach (keys %hm) {$c="grep \"$_\" $f > $f.$_";print $c;}';
+}
+
+
+
+getrealuser() {
+        typeset user ps
+        # If SUDO_USER is set, trust it
+        if [ "$SUDO_USER" ]; then
+                echo "$SUDO_USER"
+        # If LOGNAME is set, trust it
+        elif [ "$LOGNAME" = root ]; then
+                # see if 'w' knows
+                set -A user $(w | grep "$(tty)")
+                if [ -z "$user" -o "$user" = root ]; then
+                        # No, hunt up the pid tree
+                        set -A ps $(ps -fp $PPID)
+                        while [ "${ps[8]}" = root -a ${ps[10]} -ne 1 ]; do
+                                set -A ps $(ps -fp ${ps[10]})
+                        done
+                        user="${ps[8]-root}"
+                        if [ "$user" = root ]; then
+                                user="$(ask "Who are you" ||
+                                        return 1)" || exit 1
+				verifyuser $user || exit 1
+                        fi
+                fi
+                echo $user
+        else
+                echo $LOGNAME
+        fi
+}
+# encrypted <salt> <clear>
+encrypted() {
+        typeset salt="$1" clr="$2" epw
+        # Pad clear passwd to 8 chars
+        case ${#clr} in
+        0)      echo -u2 "Password not known"; exit 1 ;;
+        1)      clr="${clr}\0\0\0\0\0\0\0" ;;
+        2)      clr="${clr}\0\0\0\0\0\0" ;;
+        3)      clr="${clr}\0\0\0\0\0" ;;
+        4)      clr="${clr}\0\0\0\0" ;;
+        5)      clr="${clr}\0\0\0" ;;
+        6)      clr="${clr}\0\0" ;;
+        7)      clr="${clr}\0" ;;
+        *)      clr="${clr%${clr#????????}}" ;;
+        esac
+        # See how it encrypts
+        epw="$(echo "${clr}$salt" | /usr/lib/makekey)"
+        unset clr
+        echo "$epw"
+}
+ask() {
+	# Generic question asker
+	# reply=$(ask [<prompt> [<default-ans> [<valid-list>]]])
+	[ "${FDBG-}" ] && set -A fDbG $FDBG && [ $fDbG = set ] && eval $fDbG ${fDbG[1]}
+	while true; do
+		echo -u2 -n "${1-Reply}${2+ [}${2-}${2+]}: "
+		read askans
+		[ "$askans" = "q" ] && return 1
+		[ $# -le 1 ] && { echo "$askans"; return; }
+		[ -z "$askans" -a "$2" ] && { echo "$2"; return; }
+		[ $# -eq 2 ] && { echo "$askans"; return; }
+		set -A valid $*; valid[0]=""; valid[1]=""
+		set -A valid ${valid[*]}
+		valid[0]=" ${valid[*]} "
+		[ "${valid% ${askans} *}" != "$valid" ] && {
+		echo "$askans"; return; }
+	done
+}
+yorn() {
+	[ "${FDBG-}" ] && set -A fDbG $FDBG && [ $fDbG = set ] && eval $fDbG ${fDbG[1]}
+	typeset yorno ans
+	[ "${1#-u}" != "${1-}" ] && yorno="${1-}" && shift
+	ans=""
+	while [ ! "${ans-}" ]; do
+		echo -u2 ${yorno-} -n "${1-} y/n: "
+		read ans
+		[ -z "${ans-}" -a "${2-}" ] && ans="${2-}"
+		case "${ans-}" in
+		-x|-v)  set ${1-}; ans="" ;;
+		q*|Q*)  exit 2 ;;
+		y*|Y*)  return 0 ;;
+		n*|N*)  return 1 ;;
+		*)      ans="" ;;
+		esac
+	done
+}
+sel() {
+	[ "${FDBG-}" ] && set -A fDbG $FDBG && [ $fDbG = set ] && eval $fDbG ${fDbG[1]}
+	# These names cannot be used as the array names as they ar replaced
+	typeset Reserved=" Reserved ITEMS item i j "
+	[ "${Reserved% $1 *}" = "$Reserved" ] || {
+		echo -u2 "Program error.  $1 is reserved"; exit; }
+	typeset ITEMS item
+	typeset -i i=0 j
+	j=$(eval echo '${#'$1'[*]}')
+	eval $(echo set -A ITEMS Quit '"${'${1}'[@]}"')
+	k=$(($j - 1))
+	j=$(($j + 1))
+	[ "${-%x*}" = "$-" ] && clear > /dev/tty 2>&1
+	[ "$title" ] && echo -u2 "$title"
+	typeset rpy="" i=0
+	select ITEM in "${ITEMS[@]}"; do
+		case "$REPLY" in
+		1|[Qq])		echo "exit"; return 1 ;;
+		!!)		exec $this $args ;;
+		!set)		set 1>&2 ;;
+		[+-][xv])
+				set "$REPLY"
+				echo "export FDBG=\"set $REPLY\";"
+				;;
+		[Bb])
+			[ "${ITEMS[0]}" = Back ] && echo "idx=0" && return ;;
+		[2-9]|[1-9][0-9])
+			[ "$REPLY" -le $j ] &&
+			echo "idx=$(($REPLY - 2))" && return ;;
+		*)
+			i=0
+			until [ "${ITEMS[$i]}" = "$REPLY" -o $i -gt $k ]; do
+				i=$(($i + 1))
+			done
+			[ $i -le $k ] && echo "idx=$i" && break
+		;;
+	esac
+	done
+	return 0
+}
+F_Alphabetic(){
+    [[ $# -eq 1 ]] && [[ $1 = +([A-z]) ]] && return 0
+    return 1
+}
+F_Numeric(){
+    [[ $# -eq 1 ]] && [[ $1 = *(-)+([0-9]) ]] && return 0
+    return 1
+}
+F_Decimal(){
+[[ $# -eq 1 ]] && [[ $1 = *(-)*([0-9])?(\.)+([0-9]) ]] && return 0
+    return 1
+}
+Enter(){
+	echo Press Enter
+	read x
+}

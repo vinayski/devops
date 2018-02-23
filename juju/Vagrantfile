@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
      sudo apt-get update
      sudo apt-get install -y ansible
-     sudo apt-get install snapd
+     sudo apt-get install -y snapd
      sudo snap install snapcraft --classic
     SHELL
 end
