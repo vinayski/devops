@@ -1,3 +1,5 @@
+#add vagrant plugin
+vagrant plugin install vagrant-disksize
 #add new box
 vagrant box add ubuntu/trusty64
 #list boxes
