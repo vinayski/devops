@@ -1,19 +1,33 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
 Vagrant.configure("2") do |config|
+  # Every Vagrant development environment requires a box. You can search for boxes at https://app.vagrantup.com/boxes/search?utf8=%E2%9C%93&sort=downloads&provider=&q=ansible
   config.vm.box = "ubuntu/trusty64-juju"
   #vagrant plugin install vagrant-disksize
   config.disksize.size = '12GB'
   config.vm.provider "virtualbox" do |vb|
+     # Display the VirtualBox GUI when booting the machine
      vb.gui = true
      #Customize the amount of memory on the VM:
      #vb.memory = "256"
   end
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.  
   config.vm.provision "shell", inline: <<-SHELL
      sudo apt-get update
      sudo apt-get install -y ansible
      sudo apt-get install -y snapd
+     sudo apt-get install -y vpnc
+     sudo hostname -b usstlat
      sudo snap install snapcraft --classic
      git clone https://github.com/vinayski/home.git home
      ln -sf home/.profile .profile
      ln -sf home/.functions .functions
+     #sudo do-release-upgrade
+     sudo shutdown -r now
+     #sudo vpn --gateway --id  
     SHELL
 end
