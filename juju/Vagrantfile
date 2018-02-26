@@ -4,6 +4,7 @@
 Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for boxes at https://app.vagrantup.com/boxes/search?utf8=%E2%9C%93&sort=downloads&provider=&q=ansible
   config.vm.box = "ubuntu/trusty64-juju"
+  config.vm.synced_folder ".", "/vagrant", disabled: true
   #vagrant plugin install vagrant-disksize
   config.disksize.size = '12GB'
   config.vm.provider "virtualbox" do |vb|
@@ -18,16 +19,37 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.  
   config.vm.provision "shell", inline: <<-SHELL
      sudo apt-get update
-     sudo apt-get install -y ansible
+     sudo apt-get install -y ansible sshpass
      sudo apt-get install -y snapd
-     sudo apt-get install -y vpnc
-     sudo hostname -b usstlat
+     sudo apt-get install -y vpnc sshuttle
+     sudo apt-get install -y dos2unix
      sudo snap install snapcraft --classic
+     sudo bash -c 'echo deb http://archive.ubuntu.com/ubuntu xenial universe > /etc/apt/sources.list.d/xenial.list'
+     sudo apt-get install -y debian-keyring stoken
+     sudo hostname -b usstlat
      git clone https://github.com/vinayski/home.git home
      ln -sf home/.profile .profile
      ln -sf home/.functions .functions
      #sudo do-release-upgrade
+     #stoken import --file=token.sdtid
+     #stoken setpin
+     sudo bash -c 'echo "
+[unix]
+94.35 ansible_ssh_pass='inst' ansible_ssh_user='inst'
+ "> /etc/ansible/hosts'
+     echo "
+---
+- hosts: all
+
+  tasks:
+  -name: "This is a test task"
+   command: /bin/hostname
+" > ~/test.yml
      sudo shutdown -r now
-     #sudo vpn --gateway --id  
+     #sudo vpnc 
     SHELL
+
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.playbook = "playbook.yml"
+  end    
 end
