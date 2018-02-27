@@ -1,32 +1,23 @@
 ---
-- name: stoken
+- name: install dependencies
   apt:
-    name: stoken
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - stoken
+    - expect
+    - vpnc
+    - sshuttle
+    - git
 
 - pip:
     name: pexpect
     
-- name: expect
-  apt:
-    name: expect
-
 - name: Import Token
   expect: 
     command: stoken import --force --file=/vagrant/token.sdtid
     responses:
         (.*)word: \n
-
-- name: vpnc
-  apt:
-    name: vpnc
-
-- name: sshuttle
-  apt:
-    name: sshuttle
-
-- name: git
-  apt:
-    name: git
 
 - git:
     repo: 'https://github.com/vinayski/home.git'
@@ -34,14 +25,14 @@
 
     
 - file:
-    src: '/home/vagrant/home/{{ item.src }}'
-    dest: '/home/vagrant/{{ item.src }}'
+    src: '/home/vagrant/home/{{ item }}'
+    dest: '/home/vagrant/{{ item }}'
     state: link    
     force: yes
     mode: 0700
   with_items:
-    - { src: '.functions'}
-    - { src: '.profile'}
+    -  '.functions'
+    -  '.profile'
 
 - file:
     src: '/vagrant/{{ item.s }}'
@@ -50,7 +41,7 @@
     force: yes
     mode: "u=rwx,g=rx,o=rx"
   with_items:
-          - { s: 'vpnc.default' , d:'/etc/default/vpnc'}
-          - { s: 'reconnect-script', d:'/etc/vpnc/reconnect-script'}
-          - { s: 'vpnc-script-disconnect-action', d:'/etc/vpnc/vpnc-script-disconnect-action'}
-          - { s: 'vpnc', d:'/etc/init.d/vpnc'}
+          - { s: 'vpnc.default' , d: '/etc/default/vpnc'}
+          - { s: 'reconnect-script' , d: '/etc/vpnc/reconnect-script'}
+          - { s: 'vpnc-script-disconnect-action' , d: '/etc/vpnc/vpnc-script-disconnect-action'}
+          - { s: 'vpnc' , d: '/etc/init.d/vpnc'}
