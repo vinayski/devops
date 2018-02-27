@@ -1,0 +1,8 @@
+---
+- hosts: all
+  become: True
+  tasks:
+    - include: tasks/apt.yml
+      # handlers:
+      #- include: handlers/nginx.yml
+

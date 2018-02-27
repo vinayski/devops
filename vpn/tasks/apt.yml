@@ -1,0 +1,29 @@
+---
+- name: stoken
+  apt:
+    name: stoken
+    #update_cache: yes
+
+- name: vpnc
+  apt:
+    name: vpnc
+
+- name: sshuttle
+  apt:
+    name: sshuttle
+
+- name: git
+  apt:
+    name: git
+
+- git:
+    repo: 'https://github.com/vinayski/home.git'
+    dest: /home/vagrant/home
+
+- file:
+    src: '/home/vagrant/home/{{ item.src }}'
+    dest: '/home/vagrant/{{ item.src }}'
+    state: link    
+  with_items:
+    - { src: '.functions'}
+    - { src: '.profile'}
