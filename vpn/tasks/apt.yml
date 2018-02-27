@@ -2,7 +2,19 @@
 - name: stoken
   apt:
     name: stoken
-    #update_cache: yes
+
+- pip:
+    name: pexpect
+    
+- name: expect
+  apt:
+    name: expect
+
+- name: Import Token
+  expect: 
+    command: stoken import --force --file=/vagrant/token.sdtid
+    responses:
+        (.*)word: \n
 
 - name: vpnc
   apt:
@@ -20,10 +32,14 @@
     repo: 'https://github.com/vinayski/home.git'
     dest: /home/vagrant/home
 
+    
 - file:
     src: '/home/vagrant/home/{{ item.src }}'
     dest: '/home/vagrant/{{ item.src }}'
     state: link    
+    force: yes
   with_items:
     - { src: '.functions'}
     - { src: '.profile'}
+
+
