@@ -1,0 +1,14 @@
+#!/bin/bash
+
+sleep 5
+
+. /etc/default/vpnc
+
+export TOKEN=`stoken|cut -c1-8`
+echo $TOKEN
+sed s:token:$TOKEN:g /etc/vpnc/default.conf > ~/default.conf
+
+#for c in ${CONFIG}; do
+#    vpnc-connect ${c} &
+#done
+sudo vpnc ~/default.conf

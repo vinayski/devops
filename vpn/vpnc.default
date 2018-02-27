@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# place all the conf files you want started in the variable CONFIG
+CONFIG[0]="/home/vagrant/default.conf"
+
+# For example, the next configuration file would be declared as such:
+#CONFIG[1]="/etc/vpnc/another.conf"

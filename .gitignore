@@ -1,7 +1,8 @@
 *~
+*swp
 *.gem
 *.rbc
-.vagrant
+.vagrant*
 .rspec
 /.config
 /coverage/
