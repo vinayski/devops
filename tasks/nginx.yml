@@ -1,0 +1,16 @@
+---
+- name: Install nginx web server
+  yum: name=nginx state=installed update_cache=true
+  notify:
+    - restart nginx
+
+- name: Upload config
+  copy: src=config/nginx.conf dest=/etc/nginx/nginx.conf mode=0600
+  notify: restart nginx
+
+- name: Upload cert
+  copy: src=files/self-signed.crt dest=/etc/nginx/ssl/ mode=0600
+
+- name: Upload key
+  copy: src=files/self-signed.key dest=/etc/nginx/ssl/ mode=0600
+

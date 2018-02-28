@@ -9,6 +9,7 @@
     - vpnc
     - sshuttle
     - git
+    - vim
 
 - pip:
     name: pexpect
@@ -45,3 +46,11 @@
           - { s: 'reconnect-script' , d: '/etc/vpnc/reconnect-script'}
           - { s: 'vpnc-script-disconnect-action' , d: '/etc/vpnc/vpnc-script-disconnect-action'}
           - { s: 'vpnc' , d: '/etc/init.d/vpnc'}
+          - { s: 'vpn.sh' , d: '/home/vagrant/vpn.sh'}
+          - { s: 'vpncheck.sh' , d: '/home/vagrant/vpncheck.sh'}
+
+- cron:
+    name: "check vpn"
+    minute: "*"
+    user: "vagrant"
+    job: "/home/vagrant/vpncheck.sh >>  ~/restart-vpnc.log 2>&1"

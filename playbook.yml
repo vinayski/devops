@@ -1,0 +1,10 @@
+---
+- hosts: all
+  become: True
+  tasks:
+    - include: tasks/deps.yml
+    - include: tasks/nginx.yml
+    - include: tasks/app.yml
+  handlers:
+    - include: handlers/nginx.yml
+

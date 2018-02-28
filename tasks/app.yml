@@ -1,0 +1,21 @@
+---
+- name: install runit
+  yum:
+    name: https://packagecloud.io/imeyer/runit/packages/el/7/runit-2.1.2-3.el7.centos.x86_64.rpm/download.rpm
+    state: present
+
+- name: Copy application
+  unarchive:
+    src: application.zip
+    dest: /opt
+
+- file:
+    src: /opt/application
+    dest: /etc/service/application
+    state: link    
+
+- name: configure runit to start the application as a runit service
+  runit:
+    name: application
+    state: started
+    service_dir: /opt      
