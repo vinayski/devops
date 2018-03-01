@@ -7,6 +7,10 @@ fi
 if [ -f ~/.functions ]; then
 . ~/.functions
 fi
+# set PATH so it includes user's private bin if it exists
+if [ -d ~/bin ] ; then
+    PATH=~/bin:$PATH
+fi
 set -o ignoreeof  # only "exit" or "logout" will log me off the system.
 set -o vi
 #shopt -s huponexit

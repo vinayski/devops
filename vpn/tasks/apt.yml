@@ -1,4 +1,8 @@
 ---
+- name: set timezone to USA/Arizona
+  timezone:
+    name: America/Phoenix
+
 - name: install dependencies
   apt:
     name: "{{ item }}"
