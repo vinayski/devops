@@ -1,0 +1,10 @@
+---
+- name: install juju dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - snapd
+
+- name: Install Snapcraft
+  command: sudo snap install snapcraft --classic
