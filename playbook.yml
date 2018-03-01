@@ -1,6 +1,7 @@
 ---
 - hosts: all
   become: True
+  gather_facts: True
   tasks:
     - include: tasks/deps.yml
     - include: tasks/nginx.yml

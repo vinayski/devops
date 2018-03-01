@@ -19,32 +19,19 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.  
   config.vm.provision "shell", inline: <<-SHELL
      #sudo apt-get update
-     #sudo apt-get install -y ansible 
-     #sshpass git
-     #sudo apt-get install -y vpnc sshuttle
-     #sudo apt-get install -y dos2unix
-     #sudo apt-get install -y debian-keyring stoken
-     sudo hostname -b usstlat
+     #sudo apt-get install -y ansible sshpass snapd vpnc sshuttle dos2unix debian-keyring stoken
+     #sudo snap install snapcraft --classic
+     #sudo bash -c 'echo deb http://archive.ubuntu.com/ubuntu xenial universe > /etc/apt/sources.list.d/xenial.list'
+     #sudo hostname -b usstlat
      #git clone https://github.com/vinayski/home.git home
      #ln -sf home/.profile .profile
      #ln -sf home/.functions .functions
      #sudo do-release-upgrade
-     #stoken import --file=token.sdtid
-     #stoken setpin
-     sudo bash -c 'echo "
-[unix]
-94.35 ansible_ssh_pass='inst' ansible_ssh_user='inst'
- "> ~/inventory'
-     echo "
----
-- hosts: all
+     #sudo bash -c 'echo "
+#[unix]
+#94.35 ansible_ssh_pass='inst' ansible_ssh_user='inst'
+# "> ~/inventory'
 
-  tasks:
-  -name: "This is a test task"
-   command: /bin/hostname
-" > ~/test.yml
-     #sudo shutdown -r now
-     #sudo vpnc 
     SHELL
 
   config.vm.provision "ansible_local" do |ansible|
