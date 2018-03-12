@@ -1,0 +1,48 @@
+---
+- name: install basic package
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - expect
+    - git
+    - vim
+    - python-pip
+    - sudo
+
+- name: install system updates for centos systems
+  yum: 
+    name= "{{ item }}"
+    state=latest 
+    update_cache=yes
+  with_items:
+    - unzip
+    - libselinux-python
+    - openssl
+    - nginx
+  when: ansible_distribution == "CentOS"
+
+- name: install system updates for {{ ansible_distribution }} 
+  apt: upgrade=dist update_cache=yes
+  when: ansible_distribution == "Ubuntu"  
+
+- pip:
+    name: pexpect
+
+- git:
+    repo: 'https://github.com/vinayski/home.git'
+    dest: /home/vagrant/home
+    
+- file:
+    src: '/home/vagrant/home/{{ item }}'
+    dest: '/home/vagrant/{{ item }}'
+    owner: vagrant
+    group: vagrant
+    state: link    
+    force: yes
+    mode: 0700
+  with_items:
+    -  '.functions'
+    -  '.profile'
+    
+    

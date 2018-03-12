@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: True
+  become: True
+  tasks:
+    - include: env.yml
+    - include: deps.yml
+    - include: vpn.yml

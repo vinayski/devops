@@ -1,0 +1,46 @@
+---
+- name: install dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - stoken
+    - expect
+    - vpnc
+    - sshuttle
+    - cron
+
+- pip:
+    name: pexpect
+
+- name: check if token file exists.
+  stat:
+    path: /tmp/token.sdtid
+  register: token
+    
+- name: Import Token
+  expect: 
+    command: stoken import --force --file=/tmp/token.sdtid
+    responses:
+        (.*)word: \n
+  when: token.stat.exists
+
+- file:
+    src: '/tmp/{{ item.s }}'
+    dest: '{{ item.d }}'
+    state: link    
+    force: yes
+    mode: "u=rwx,g=rx,o=rx"
+  with_items:
+          - { s: 'vpnc.default' , d: '/etc/default/vpnc'}
+          - { s: 'reconnect-script' , d: '/etc/vpnc/reconnect-script'}
+          - { s: 'vpnc-script-disconnect-action' , d: '/etc/vpnc/vpnc-script-disconnect-action'}
+          - { s: 'vpnc' , d: '/etc/init.d/vpnc'}
+          - { s: 'vpn.sh' , d: '/home/vagrant/vpn.sh'}
+          - { s: 'vpncheck.sh' , d: '/home/vagrant/vpncheck.sh'}
+
+- cron:
+    name: "check vpn"
+    minute: "*"
+    user: "vagrant"
+    job: "/tmp/vpncheck.sh >>  /tmp/restart-vpnc.log 2>&1"
