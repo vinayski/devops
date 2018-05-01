@@ -27,6 +27,7 @@ export PAGER=less
 export ENV=$HOME/.bashrc
 export HISTSIZE=1000
 export HISTFILESIZE=1000
+export HISTCONTROL=ignoredups:ignorespace
 export LESS='-fXemPm?f%f .?lbLine %lb?L of %L..:$' # Set options for less command
 export TERM=xterm  # PuTTY emulates this.
 export TMPDIR=~/tmp
