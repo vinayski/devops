@@ -1,0 +1,19 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/stretch64"
+  config.vm.synced_folder ".", "/vagrant", disabled: false, create: true
+  #vagrant plugin install vagrant-disksize
+  config.disksize.size = '2GB'
+  config.vm.provider "virtualbox" do |vb|
+     vb.name = "junipervpn"
+     vb.memory = "256"
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+     sudo apt-get update
+     sudo apt-get install -y openconnect
+     #sudo bash -c 'echo deb http://packages.linuxmint.com debian import > /etc/apt/sources.list.d/firefox.list'
+     echo "openconnect --juniper https://junipervpn.com/welcome.cgi"
+end
