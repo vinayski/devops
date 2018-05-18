@@ -16,4 +16,5 @@ Vagrant.configure("2") do |config|
      sudo apt-get install -y openconnect
      #sudo bash -c 'echo deb http://packages.linuxmint.com debian import > /etc/apt/sources.list.d/firefox.list'
      echo "openconnect --juniper https://junipervpn.com/welcome.cgi"
+     SHELL
 end
