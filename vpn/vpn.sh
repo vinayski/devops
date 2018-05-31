@@ -1,9 +1,9 @@
-sudo bash -c 'echo "IPSec gateway vpc.vpn.com
-IPSec ID group
-IPSec secret vpn
+sudo bash -c 'echo "IPSec gateway server.com
+IPSec ID 
+IPSec secret 
 Xauth username 
 Xauth password token
-DPD idle timeout 0
+DPD idle timeout (our side) 0
 " > /etc/vpnc/default.conf'
 sudo bash -c 'chmod -R 755 /etc/vpnc'
 sudo bash -c 'chmod -R 777 /etc/vpnc/default.conf'
