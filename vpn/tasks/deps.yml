@@ -1,0 +1,54 @@
+---
+- name: install basic package
+  action: >
+    {{ ansible_pkg_mgr }} 
+      name= "{{ item }}"
+      state=present 
+      update_cache=yes
+      install_recommends=no
+  with_items:
+    - expect
+    - git
+    - vim
+    - python
+
+- name: install system updates for {{ ansible_distribution }} 
+  apt: 
+    upgrade: no 
+    update_cache: yes
+  when: ansible_distribution == "Debian"  
+
+- name: install basic package using apt
+  apt: 
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+    install_recommends: yes
+  with_items:
+    - expect
+    - git
+    - vim
+    - python
+  when: ansible_distribution == "Debian"
+
+- name: install git
+  apt: 
+    name: git
+    state: latest
+    update_cache: yes
+    install_recommends: yes
+  when: ansible_distribution == "Debian"
+
+- name: install system updates for centos systems
+  yum: 
+    name: "{{ item }}"
+    state: latest 
+    update_cache: yes
+  with_items:
+    - unzip
+    - libselinux-python
+    - openssl
+    - nginx
+  when: ansible_distribution == "CentOS"
+
+
