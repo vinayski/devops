@@ -52,5 +52,5 @@
     - nginx
   when: ansible_distribution == "CentOS"
 
-- name: pip install
-  pip: pexpect 
+- pip: 
+   name: pexpect 
