@@ -1,11 +1,11 @@
 ---
-- name: install basic package
+- name: install basic package using {{ ansible_pkg_mgr }}
   action: >
     {{ ansible_pkg_mgr }} 
-      name= "{{ item }}"
-      state=present 
-      update_cache=yes
-      install_recommends=no
+    name= "{{ item }}"
+    state=present 
+    update_cache=yes
+    install_recommends=no
   with_items:
     - expect
     - git
@@ -52,5 +52,5 @@
     - nginx
   when: ansible_distribution == "CentOS"
 
-- pip:
-    name: pexpect
+- name: pip install
+  pip: pexpect 
