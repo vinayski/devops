@@ -29,6 +29,7 @@
     - git
     - vim
     - python
+    - python-pip
   when: ansible_distribution == "Debian"
 
 - name: install git
@@ -51,4 +52,5 @@
     - nginx
   when: ansible_distribution == "CentOS"
 
-
+- pip:
+    name: pexpect
