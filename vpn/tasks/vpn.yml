@@ -7,7 +7,12 @@
     - stoken
     - expect
     - vpnc
+    - openconnect
     - sshuttle
+
+- name: print openconnect cmd
+  debug:
+    msg: "openconnect --juniper https://junipervpn.com/welcome.cgi"      
 
 - name: Import Token
   expect: 
