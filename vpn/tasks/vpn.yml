@@ -20,6 +20,18 @@
     responses:
         (.*)word: \n
 
+- name: Import other Token
+  expect: 
+    command: stoken import --force --file=/vagrant/503897441.sdtid
+    responses:
+        (.*)word: \n
+
+- name: Install snx
+  expect: 
+    command: sudo /vagrant/snx_install_linux30.sh
+    responses:
+        (.*)word: \n        
+
 - file:
     src: '/vagrant/{{ item.s }}'
     dest: '{{ item.d }}'

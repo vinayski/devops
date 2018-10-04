@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
   #vagrant plugin install vagrant-disksize
   config.disksize.size = '10GB'
   config.vm.provider "virtualbox" do |vb|
-     vb.name = "debian-vpn"
+     vb.name = "dox-vpn"
      # Display the VirtualBox GUI when booting the machine
      #vb.gui = true
      #Customize the amount of memory on the VM:
