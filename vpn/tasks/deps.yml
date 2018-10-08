@@ -1,6 +1,6 @@
 ---
 - name: add pub key
-  shell: echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDU/rdD2WgoaSVm2e4ZtqMU+U1m5DqemcrI41bXfi+5T4aXS5j0/cxwkxYmWUy/eyDOo0YVyFdSK9jCClENVnvl2JGJro4YiBdC1Acd/4XHrhgyWXKgXAGHq92K4j+AXZgm3g6Bl/LuoB7OhYPi8cte4gtTkk++SEuJGsTGXaQI2OXcaH3u4l4mikG92CfzC+3ERFZibeHiLYQMhb0NIY8Pp5nLRXGsYrvjKmhFUMk4yBSKacou2rRT5GQpzvWKG8O3NqYhk/YKivD92qbFBwM6X5vDl+7SbHMCGdunSJ5iL9t99dXJj7W+s6zxSnr9HKvHCbEfkOPxIR/U+M3IUMan" > ~/.ssh/authorized_keys
+  shell: echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDU/rdD2WgoaSVm2e4ZtqMU+U1m5DqemcrI41bXfi+5T4aXS5j0/cxwkxYmWUy/eyDOo0YVyFdSK9jCClENVnvl2JGJro4YiBdC1Acd/4XHrhgyWXKgXAGHq92K4j+AXZgm3g6Bl/LuoB7OhYPi8cte4gtTkk++SEuJGsTGXaQI2OXcaH3u4l4mikG92CfzC+3ERFZibeHiLYQMhb0NIY8Pp5nLRXGsYrvjKmhFUMk4yBSKacou2rRT5GQpzvWKG8O3NqYhk/YKivD92qbFBwM6X5vDl+7SbHMCGdunSJ5iL9t99dXJj7W+s6zxSnr9HKvHCbEfkOPxIR/U+M3IUMan" > /home/vagrant/.ssh/authorized_keys
 
 - name: install basic package using {{ ansible_pkg_mgr }}
   action: >

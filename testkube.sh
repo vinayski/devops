@@ -1,6 +1,7 @@
 #check version
 minikube version
 #start cluster
+#minikube start --docker-env HTTP_PROXY=http://proxy:8080 --docker-env HTTPS_PROXY=https://proxy:8080
 minikube start
 #check health
 kubectl cluster-info

@@ -10,6 +10,21 @@
     - openconnect
     - sshuttle
 
+- name: install snx dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - lib32z1
+    - lib32ncurses5
+    - libx11-6:i386
+    - libstdc++5:i386
+    - libpam0g:i386
+
+#deb http://ftp.de.debian.org/debian sid main       
+#sudo dpkg --add-architecture i386
+#sudo ldd /usr/bin/snx
+
 - name: print openconnect cmd
   debug:
     msg: "openconnect --juniper https://junipervpn.com/welcome.cgi"      
@@ -28,7 +43,7 @@
 
 - name: Install snx
   expect: 
-    command: sudo /vagrant/snx_install_linux30.sh
+    command: /vagrant/snx_install_linux30.sh
     responses:
         (.*)word: \n        
 
