@@ -1,3 +1,11 @@
+export pinghost=${1:-1.1.1.1}   
+export VPN=`ps -C vpnc | wc -l`
+export VPNPID=`ps --no-header -C vpnc | cut -c1-6`
+ping -q -c5 $pinghost > /dev/null
+if [ $VPN -ge 2 ]; then 
+	echo `date` ": kill vpn pid:$VPNPID " 
+	sudo kill -9 $VPNPID
+fi
 sudo bash -c 'echo "IPSec gateway server.com
 IPSec ID 
 IPSec secret 
