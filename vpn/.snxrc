@@ -1,0 +1,4 @@
+server vpn.server.com
+username <userid>
+reauth yes
+debug yes
