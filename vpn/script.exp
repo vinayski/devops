@@ -1,0 +1,31 @@
+#!/usr/bin/expect -f
+set force_conservative 0  ;# set to 1 to force conservative mode even if
+			  ;# script wasn't run conservatively originally
+if {$force_conservative} {
+	set send_slow {1 .1}
+	proc send {ignore arg} {
+		sleep .1
+		exp_send -s -- $arg
+	}
+}
+set timeout 30
+#unset -nocomplain ::env(SSH_AUTH_SOCK)   ;# This one is session-bound anyway
+#puts [list array set ::env [array get ::env]]
+spawn $env(SHELL)
+match_max 100000
+expect -exact "\]0;vagrant@localhost: ~vagrant@localhost:~\$ "
+send -- "stoken\r"
+expect -re "stoken\r
+(.*)\r"
+send_log $expect_out(buffer)
+send -- "snx\r"
+expect -exact "snx\r
+Check Point's Linux SNX\r
+build 800007075\r
+Please enter your password:\r
+"
+send "$expect_out(1,string)\r"
+expect -re "(.*) "
+send -- "exit\r"
+expect eof
+exit
