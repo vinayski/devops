@@ -8,10 +8,11 @@ if [ $VPN -ge 2 ] && [ $? -eq 0 ]; then
 else 
   if [ $VPN -ge 2 ]; then 
 	  echo `date` ": kill snx vpn pid:$VPNPID"
-	  #sudo kill -9 $VPNPID
+	  sudo kill -9 $VPNPID
+	  sudo snx -d
   fi
-  echo ~/snx.sh
-  sleep 2
+  expect -f /home/vagrant/script.exp
+  sleep 1
   export VPNPID=`ps --no-header -C snx | cut -c1-6`
   curl https://$pinghost > /dev/null
   echo `date` ": snx vpn pid:$VPNPID $?"
