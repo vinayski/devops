@@ -32,3 +32,8 @@ docker run -d -l vpn -P -it --name vpn megamanics/docker:vpn
 docker attach vpn
 ```
 
+### How to run using docker-compose:
+```
+docker-compose up
+```
+
